@@ -3,7 +3,6 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
 #[allow(dead_code)]
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Color {
@@ -37,7 +36,6 @@ impl ColorCode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
-
 struct ScreenChar {
     ascii_character: u8,
     color_code: ColorCode,
@@ -126,19 +124,6 @@ impl Write for Writer {
     }
 }
 
-pub fn print_something() {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
-
-    writer.write_byte(b'H');
-    writer.write_string("ello ");
-    // writer.write_string("World!");
-    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
-}
-
 // ---------------------------------
 //
 // Macros
@@ -156,4 +141,26 @@ macro_rules! println {
 #[doc(hidden)]
 pub fn _print(args: Arguments) {
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+#[test_case]
+fn test_println_simple() {
+    println!("test_prinln_simple_output");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("Test_println_many output");
+    }
+}
+
+#[test_case]
+fn test_prinln_output() {
+    let s = "Some test string that fits on a single line";
+    println!("{s}");
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+        assert_eq!(char::from(screen_char.ascii_character), c);
+    }
 }
