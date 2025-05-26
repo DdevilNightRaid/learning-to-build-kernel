@@ -21,9 +21,16 @@ fn panic(info: &PanicInfo) -> ! {
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
+    println!("Hello world");
+
+    blog_os::init();
+
+    x86_64::instructions::interrupts::int3();
+
     #[cfg(test)]
     test_main();
 
+    println!("it did not crash..!");
     #[allow(clippy::empty_loop)]
     loop {}
 }
