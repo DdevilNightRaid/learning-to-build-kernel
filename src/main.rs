@@ -32,7 +32,9 @@ pub extern "C" fn _start() -> ! {
         "Level 4 page table at {:?}",
         level_4_page_table.start_address()
     );
+  
     // x86_64::instructions::interrupts::int3();
+    x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
